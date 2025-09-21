@@ -22,11 +22,15 @@ int main(void)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
     
     // Verificar perifericos:
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0))  {}
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER0)) {}
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA))  {}
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPION))  {}
+
+    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, 0x01); // Enable pin 0 and 1
 
     // Configurar Uart:
     GPIOPinConfigure(GPIO_PA0_U0RX);
@@ -37,10 +41,10 @@ int main(void)
 
     while(1)
     {
-        UARTprintf(msg);
-        // UARTgets(data, 100);
-        // strcat(data, "\n");
-        // UARTprintf(data);
-        SysCtlDelay(freq/3);
+        UARTgets(data, 100);
+        GPIOPinWrite(GPIO_PORTN_BASE, 0x01, 0x01);
+        SysCtlDelay(freq/2);
+        GPIOPinWrite(GPIO_PORTN_BASE, 0x01, 0);
+        SysCtlDelay(freq/2);
     }
 }

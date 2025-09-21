@@ -6,11 +6,8 @@ ser.reset_input_buffer()
 
 while True:
     try:
-        if ser.in_waiting > 0:
-            value = ser.readline().decode('utf-8').rstrip()
-            if value:
-                print("RX:", value)
-            else:
-                print("No data")
+        ser.write(b"hola\n")   # Ahora sí manda al puerto serial
+        print("enviado: hola")
+        sleep(1.5)
     except Exception as e:
         print(e)
