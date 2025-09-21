@@ -1,4 +1,4 @@
-gcc/L5ejr1T.o: L5ejr1T.c \
+gcc/L5Pry_PrtUartMotor_T.o: L5Pry_PrtUartMotor_T.c \
  /usr/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h \
  /usr/lib/gcc/arm-none-eabi/13.2.1/include/stdbool.h \
  ../../../../inc/hw_memmap.h ../../../../driverlib/debug.h \

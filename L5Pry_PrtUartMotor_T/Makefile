@@ -1,6 +1,6 @@
 #******************************************************************************
 #
-# Makefile - Rules for building the L5ejr1T example.
+# Makefile - Rules for building the L5Pry_PrtUartMotor_T example.
 #
 # Copyright (c) 2013-2020 Texas Instruments Incorporated.  All rights reserved.
 # Software License Agreement
@@ -43,10 +43,10 @@ include ${ROOT}/makedefs
 IPATH=../../../..
 
 #
-# The default rule, which causes the L5ejr1T example to be built.
+# The default rule, which causes the L5Pry_PrtUartMotor_T example to be built.
 #
 all: ${COMPILER}
-all: ${COMPILER}/L5ejr1T.axf
+all: ${COMPILER}/L5Pry_PrtUartMotor_T.axf
 
 #
 # The rule to clean out all the build products.
@@ -61,15 +61,15 @@ ${COMPILER}:
 	@mkdir -p ${COMPILER}
 
 #
-# Rules for building the L5ejr1T example.
+# Rules for building the L5Pry_PrtUartMotor_T example.
 #
-${COMPILER}/L5ejr1T.axf: ${COMPILER}/startup_${COMPILER}.o
-${COMPILER}/L5ejr1T.axf: ${COMPILER}/L5ejr1T.o
-${COMPILER}/L5ejr1T.axf: ${ROOT}/driverlib/${COMPILER}/libdriver.a
-${COMPILER}/L5ejr1T.axf: ${ROOT}/utils/uartstdio.c
-${COMPILER}/L5ejr1T.axf: L5ejr1T.ld
-SCATTERgcc_L5ejr1T=L5ejr1T.ld
-ENTRY_L5ejr1T=ResetISR
+${COMPILER}/L5Pry_PrtUartMotor_T.axf: ${COMPILER}/startup_${COMPILER}.o
+${COMPILER}/L5Pry_PrtUartMotor_T.axf: ${COMPILER}/L5Pry_PrtUartMotor_T.o
+${COMPILER}/L5Pry_PrtUartMotor_T.axf: ${ROOT}/driverlib/${COMPILER}/libdriver.a
+${COMPILER}/L5Pry_PrtUartMotor_T.axf: ${ROOT}/utils/uartstdio.c
+${COMPILER}/L5Pry_PrtUartMotor_T.axf: L5Pry_PrtUartMotor_T.ld
+SCATTERgcc_L5Pry_PrtUartMotor_T=L5Pry_PrtUartMotor_T.ld
+ENTRY_L5Pry_PrtUartMotor_T=ResetISR
 CFLAGSgcc=-DTARGET_IS_TM4C129_RA2
 
 #
