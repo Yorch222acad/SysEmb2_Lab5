@@ -96,18 +96,18 @@ int main(void)
 
     while(1)
     {
-        LecBtn(freq);
-        GPIOPinWrite(GPIO_PORTN_BASE, 0x03, 0);  // Apaga PN0 y PN1
-        checkUART(rxBuffer, freq);
-        GPIOPinWrite(GPIO_PORTF_BASE, 0x01, 0);
-        if (strcmp(rxBuffer, "buzzer") == 0) {
-          if (ledUart == true) {
-            ledUart = false;
-            GPIOPinWrite(GPIO_PORTF_BASE, 0x02, 0);
-          } else {
-            ledUart = true;
-            GPIOPinWrite(GPIO_PORTF_BASE, 0x02, 0x02);
-          }
+      LecBtn(freq);
+      GPIOPinWrite(GPIO_PORTN_BASE, 0x03, 0);  // Apaga PN0 y PN1
+      checkUART(rxBuffer, freq);
+      GPIOPinWrite(GPIO_PORTF_BASE, 0x01, 0);
+      if (strcmp(rxBuffer, "buzzer") == 0) {
+        if (ledUart == true) {
+          ledUart = false;
+          GPIOPinWrite(GPIO_PORTF_BASE, 0x02, 0);
+        } else {
+          ledUart = true;
+          GPIOPinWrite(GPIO_PORTF_BASE, 0x02, 0x02);
         }
+      }
     }
 }
