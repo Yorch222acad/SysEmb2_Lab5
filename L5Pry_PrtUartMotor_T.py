@@ -2,42 +2,44 @@ import RPi.GPIO as GPIO
 import serial
 from time import sleep
 
-PIN_BTN_UP = 6 
-motorA = 13
-motorA_1 = 19
-motorA_2 = 26
-estadom1 = False
+BtnBuzzer = 6 
+PwmMtrA = 13
+HighMtrA = 19
+LowMtrA = 26
+estM1 = False
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(PIN_BTN_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(motorA, GPIO.OUT)
-GPIO.setup(motorA_1, GPIO.OUT)
-GPIO.setup(motorA_2, GPIO.OUT)
-pwm = GPIO.PWM(motorA, 1000)
+GPIO.setup(BtnBuzzer, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(PwmMtrA, GPIO.OUT)
+GPIO.setup(HighMtrA, GPIO.OUT)
+GPIO.setup(LowMtrA, GPIO.OUT)
+pwm = GPIO.PWM(PwmMtrA, 1000)
 pwm.start(0)
 
 ser = serial.Serial('/dev/ttyACM0', 9600)
 ser.reset_input_buffer()
 
 while True:
-    if GPIO.input(PIN_BTN_UP) == GPIO.LOW:
+    if GPIO.input(BtnBuzzer) == GPIO.LOW:
         ser.write(b"buzzer\n")
         print("enviado: buzzer")
-        sleep(0.1)
+        sleep(0.2)
     try:
         if ser.in_waiting > 0:
             value = ser.readline().decode('utf-8').rstrip()
             if value == "motor1":
                 print("Recibido", value)
-                if estadom1 == False:
+                if estM1 == False:
+                    estM1 = True
                     pwm.ChangeDutyCycle(50)
-                    GPIO.output(motorA_1, 1)
-                    GPIO.output(motorA_2, 0)
+                    GPIO.output(HighMtrA, 1)
+                    GPIO.output(LowMtrA, 0)
                 else:
-                    pwm.ChangeDutyCycle(5)
-                    GPIO.output(motorA_1, 1)
-                    GPIO.output(motorA_2, 0)
+                    estM1 = False
+                    pwm.ChangeDutyCycle(0)
+                    GPIO.output(HighMtrA, 1)
+                    GPIO.output(LowMtrA, 0)
             else:
-                print("No data")
+                print(value)
     except Exception as e:
         print(e)
