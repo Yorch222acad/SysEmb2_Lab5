@@ -11,15 +11,21 @@
 #include "utils/uartstdio.c"
 //-------------------------------
 
-void LecBtn(int freq);
-void checkUART(char rxBuffer[10], int *rxIndex, int freq);
+int freq = 120000000;
+volatile uint32_t ui32Loop;
+
+void LecBtn();
+void checkUART(char rxBuffer[10], int *rxIndex);
+void interactiveDelay(float time_sec, int *tIter);
 
 int main(void)
 {
-    int freq = 120000000;
     char rxBuffer[10];
     bool ledUart = true;
     int rxIndex = 0;
+    int tIter = 0;
+    bool BuzzerState = false;
+    float time_sec = 2.0;
 
     SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),freq); 
 
@@ -42,7 +48,7 @@ int main(void)
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF))  {}
 
 
-    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, 0x03);
+    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, 0x07);
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, 0x11);
     //--------------------------------------------------------------
     GPIOPinTypeGPIOInput(GPIO_PORTJ_BASE, 0x03);
@@ -57,12 +63,14 @@ int main(void)
 
     while(1)
     {
-      LecBtn(freq);
+      LecBtn();
       GPIOPinWrite(GPIO_PORTN_BASE, 0x03, 0);  // Apaga PN0 y PN1
-      checkUART(rxBuffer, &rxIndex, freq);
+      checkUART(rxBuffer, &rxIndex);
       GPIOPinWrite(GPIO_PORTF_BASE, 0x01, 0);
       if (strncmp(rxBuffer, "buzzer", 6) == 0) {
+        BuzzerState = true;
         memset(rxBuffer, 0, sizeof(rxBuffer));
+        GPIOPinWrite(GPIO_PORTN_BASE, 0x04, 0x04);
         if (ledUart == true) {
           ledUart = false;
           GPIOPinWrite(GPIO_PORTF_BASE, 0x10, 0);
@@ -71,13 +79,19 @@ int main(void)
           GPIOPinWrite(GPIO_PORTF_BASE, 0x10, 0x10);
         }
       }
+      if (BuzzerState == true) {
+        interactiveDelay(time_sec, &tIter);
+        if (tIter == 0) {
+          BuzzerState = false;
+          GPIOPinWrite(GPIO_PORTN_BASE, 0x04, 0);
+        }
+      }
     }
 }
 
 //============================================================================
 
-void LecBtn(int freq) {
-  volatile uint32_t ui32Loop;
+void LecBtn() {
   if ((GPIOPinRead(GPIO_PORTJ_BASE, 0x01) == 0)) {
     UARTprintf("motor1\n");
     GPIOPinWrite(GPIO_PORTN_BASE, 0x01, 0x01);
@@ -89,30 +103,33 @@ void LecBtn(int freq) {
     for (ui32Loop = 0; ui32Loop < (freq/60); ui32Loop++) {}
   }
 }
-
-void checkUART(char rxBuffer[10], int *rxIndex, int freq) {
+//------------------------------------------------------------------
+void checkUART(char rxBuffer[10], int *rxIndex) {
   int c;
-  volatile uint32_t ui32Loop;
-
   while (UARTCharsAvail(UART0_BASE)) {
     c = UARTCharGetNonBlocking(UART0_BASE);
-    UARTprintf("Char: 0x%02X '%c'\n", c, c);
 
     if (c == -1) return;
 
     if (c == '\r' || c == '\n') {
-      rxBuffer[*rxIndex] = '\0';          // termina cadena
-      UARTprintf("RX: '%s'\n", rxBuffer); // imprime cadena completa
-      *rxIndex = 0;                        // reinicia buffer
+      rxBuffer[*rxIndex] = '\0';
+      *rxIndex = 0;
       GPIOPinWrite(GPIO_PORTF_BASE, 0x01, 0x01);
       for (ui32Loop = 0; ui32Loop < (freq/60); ui32Loop++) {}
     } else {
       if (*rxIndex < 9) {
-        rxBuffer[*rxIndex] = (char)c; // guarda carácter
+        rxBuffer[*rxIndex] = (char)c;
         (*rxIndex)++;
-        UARTprintf("rxIndex: %d\n", *rxIndex); // solo índice
       }
     }
   }
 }
-
+//------------------------------------------------------------------
+void interactiveDelay(float time_sec, int *tIter){
+  int TotalTimeIter = (int)(time_sec*10);
+  if (*tIter == 0) {
+    *tIter = TotalTimeIter;
+  }
+  for (ui32Loop = 0; ui32Loop < (freq/100); ui32Loop++) {}
+  *tIter -= 1;
+}
